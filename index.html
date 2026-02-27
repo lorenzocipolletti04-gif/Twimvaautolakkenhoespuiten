@@ -1,203 +1,158 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Schade herstellen</title>
-  <style>
-    :root{
-      --bg: #ffffff;
-      --text: #111;
-      --muted: rgba(0,0,0,.65);
-      --border: rgba(0,0,0,.12);
-      --shadow: 0 20px 60px rgba(0,0,0,.25);
-      --radius: 14px;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Schade herstellen</title>
 
-    html,body{
-      margin:0;
-      padding:0;
-      background: transparent;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--text);
-    }
+<style>
+html,body{
+  margin:0;
+  padding:0;
+  background:transparent;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
 
-    /* Container voor iframe, zodat het netjes past */
-    .wrap{
-      padding: 0;
-    }
-
-  .btn{
+.btn{
   display:inline-flex;
   align-items:center;
   gap:10px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid #e5c94a;
-  background: #FFE160;
-  color: #111;
-  font-weight: 800;
-  cursor: pointer;
-  user-select: none;
-  transition: all .15s ease;
+  padding:12px 18px;
+  border-radius:12px;
+  border:none;
+  background:#FFE160;
+  color:#111;
+  font-weight:800;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.btn:hover{ background:#ffd633; transform:translateY(-1px); }
+.btn:active{ transform:translateY(0); }
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  z-index:999999;
+}
+.modal.open{ display:block; }
+
+.backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
 }
 
-.btn:hover{
-  background: #ffd84a;
-  transform: translateY(-1px);
+.panel{
+  position:relative;
+  width:min(760px,calc(100% - 30px));
+  margin:10vh auto;
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 25px 70px rgba(0,0,0,.3);
+  overflow:hidden;
 }
 
-.btn:active{
-  transform: translateY(0);
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px;
+  border-bottom:1px solid rgba(0,0,0,.08);
 }
-    .btn:hover{ transform: translateY(-1px); }
-    .btn:active{ transform: translateY(0); }
+.header h3{
+  margin:0;
+  font-size:18px;
+  font-weight:900;
+}
 
-    /* Modal */
-    .modal{
-      position: fixed;
-      inset: 0;
-      display: none;
-      z-index: 999999;
-    }
-    .modal.open{ display:block; }
+.close{
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  border:none;
+  background:#f3f3f3;
+  cursor:pointer;
+  font-size:18px;
+}
 
-    .backdrop{
-      position:absolute;
-      inset:0;
-      background: rgba(0,0,0,.55);
-    }
+.body{
+  padding:16px;
+  max-height:65vh;
+  overflow:auto;
+}
+ol{
+  margin:0;
+  padding-left:18px;
+}
+li{ margin:10px 0; }
 
-    .panel{
-      position: relative;
-      width: min(760px, calc(100% - 28px));
-      margin: 10vh auto;
-      background: var(--bg);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 16px 16px;
-      border-bottom: 1px solid rgba(0,0,0,.08);
-    }
-    .title{
-      margin:0;
-      font-size: 18px;
-      font-weight: 900;
-    }
-    .close{
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #fff;
-      cursor:pointer;
-      font-size: 18px;
-      line-height: 1;
-    }
-
-    .body{
-      padding: 16px;
-      max-height: 65vh;
-      overflow: auto;
-    }
-
-    ol{
-      margin: 0;
-      padding-left: 18px;
-    }
-    li{ margin: 10px 0; }
-    .muted{ color: var(--muted); }
-
-    .tip{
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,204,0,.35);
-      background: rgba(255,204,0,.14);
-      font-weight: 600;
-    }
-
-    /* Klein: panel lager */
-    @media (max-width: 520px){
-      .panel{ margin: 7vh auto; }
-    }
-  </style>
+.tip{
+  margin-top:14px;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(255,204,0,.15);
+  border:1px solid rgba(255,204,0,.35);
+  font-weight:600;
+}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <button class="btn" id="openBtn" type="button">🛠️ Hoe herstel ik mijn schade?</button>
-  </div>
 
-  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="backdrop" id="backdrop"></div>
+<button class="btn" id="openBtn">🛠️ Hoe herstel ik mijn schade?</button>
 
-    <div class="panel" role="document" tabindex="-1">
-      <div class="header">
-        <h3 class="title">Stappenplan: schade herstellen</h3>
-        <button class="close" id="closeBtn" type="button" aria-label="Sluiten">✕</button>
-      </div>
+<div class="modal" id="modal">
+  <div class="backdrop" id="backdrop"></div>
 
-      <div class="body">
-        <ol>
-          <li><strong>Schuren:</strong> schuur de beschadiging vlak (bijv. P320–P600, afhankelijk van de schade).</li>
-          <li><strong>Ontvetten:</strong> reinig met ontvetter/siliconenverwijderaar en een schone microvezeldoek.</li>
-          <li><strong>Primer (indien nodig):</strong> bij kaal metaal/kunststof eerst primer, daarna licht opschuren.</li>
-          <li><strong>Kleurlaag:</strong> breng 2–4 dunne lagen aan met korte tussenpauzes.</li>
-          <li><strong>Blanke lak (bij 2-laags):</strong> voor glans & bescherming, meerdere dunne lagen.</li>
-          <li><strong>Uitharden:</strong> laat goed drogen/uitharden volgens het productadvies.</li>
-          <li><strong>Afwerking:</strong> eventueel polijsten na volledige uitharding voor een nette overgang.</li>
-        </ol>
+  <div class="panel">
+    <div class="header">
+      <h3>Stappenplan: schade herstellen</h3>
+      <button class="close" id="closeBtn">✕</button>
+    </div>
 
-        <div class="tip">
-          Tip: spuit eerst een test op karton, werk stofvrij, en houd 20–25 cm afstand.
-          <div class="muted" style="margin-top:6px;font-weight:500;">
-            (Wil je dit stappenplan langer/korter of per “kleine/middel/grote schade”?)
-          </div>
-        </div>
+    <div class="body">
+      <ol>
+        <li><strong>Schuren:</strong> schuur de beschadiging vlak (P320–P600).</li>
+        <li><strong>Ontvetten:</strong> reinig met ontvetter en schone doek.</li>
+        <li><strong>Primer:</strong> bij kaal metaal eerst primer, licht opschuren.</li>
+        <li><strong>Kleurlaag:</strong> 2–4 dunne lagen aanbrengen.</li>
+        <li><strong>Blanke lak:</strong> voor glans en bescherming.</li>
+        <li><strong>Uitharden:</strong> volledig laten drogen.</li>
+        <li><strong>Afwerken:</strong> eventueel licht polijsten.</li>
+      </ol>
+
+      <div class="tip">
+        Tip: spuit eerst een test op karton en werk stofvrij.
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    (function () {
-      const modal = document.getElementById('modal');
-      const openBtn = document.getElementById('openBtn');
-      const closeBtn = document.getElementById('closeBtn');
-      const backdrop = document.getElementById('backdrop');
-      const panel = modal.querySelector('.panel');
+<script>
+const modal = document.getElementById("modal");
+const openBtn = document.getElementById("openBtn");
+const closeBtn = document.getElementById("closeBtn");
+const backdrop = document.getElementById("backdrop");
 
-      let lastFocus = null;
+function openModal(){
+  modal.classList.add("open");
+  window.parent.postMessage("twimva-open","*");
+}
 
-      function openModal(){
-        lastFocus = document.activeElement;
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-        panel.focus();
-      }
+function closeModal(){
+  modal.classList.remove("open");
+  window.parent.postMessage("twimva-close","*");
+}
 
-      function closeModal(){
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-        if (lastFocus && lastFocus.focus) lastFocus.focus();
-      }
+openBtn.addEventListener("click", openModal);
+closeBtn.addEventListener("click", closeModal);
+backdrop.addEventListener("click", closeModal);
 
-      openBtn.addEventListener('click', openModal);
-      closeBtn.addEventListener('click', closeModal);
-      backdrop.addEventListener('click', closeModal);
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape") closeModal();
+});
+</script>
 
-      document.addEventListener('keydown', (e) => {
-        if (!modal.classList.contains('open')) return;
-        if (e.key === 'Escape') closeModal();
-      });
-    })();
-  </script>
 </body>
 </html>
