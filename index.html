@@ -3,155 +3,77 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Schade herstellen</title>
-
+<title>Stappenplan</title>
 <style>
-html,body{
-  margin:0;
-  padding:0;
-  background:transparent;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-}
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  padding:12px 18px;
-  border-radius:12px;
-  border:none;
-  background:#FFE160;
-  color:#111;
-  font-weight:800;
-  cursor:pointer;
-  transition:.15s ease;
-}
-.btn:hover{ background:#ffd633; transform:translateY(-1px); }
-.btn:active{ transform:translateY(0); }
-
-.modal{
-  position:fixed;
-  inset:0;
-  display:none;
-  z-index:999999;
-}
-.modal.open{ display:block; }
-
-.backdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.55);
-}
-
-.panel{
-  position:relative;
-  width:min(760px,calc(100% - 30px));
-  margin:10vh auto;
-  background:#fff;
-  border-radius:16px;
-  box-shadow:0 25px 70px rgba(0,0,0,.3);
-  overflow:hidden;
-}
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:16px;
-  border-bottom:1px solid rgba(0,0,0,.08);
-}
-.header h3{
-  margin:0;
-  font-size:18px;
-  font-weight:900;
-}
-
-.close{
-  width:40px;
-  height:40px;
-  border-radius:10px;
-  border:none;
-  background:#f3f3f3;
-  cursor:pointer;
-  font-size:18px;
-}
-
-.body{
-  padding:16px;
-  max-height:65vh;
-  overflow:auto;
-}
-ol{
-  margin:0;
-  padding-left:18px;
-}
-li{ margin:10px 0; }
-
-.tip{
-  margin-top:14px;
-  padding:12px;
-  border-radius:12px;
-  background:rgba(255,204,0,.15);
-  border:1px solid rgba(255,204,0,.35);
-  font-weight:600;
-}
+  html,body{height:100%;margin:0;background:transparent;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+  /* We gebruiken géén eigen backdrop fullscreen hier, want de WordPress overlay doet dat al */
+  .modal{
+    position: fixed;
+    inset: 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 18px;
+  }
+  .panel{
+    width:min(760px, 100%);
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 25px 70px rgba(0,0,0,.30);
+    overflow:hidden;
+  }
+  .header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px;border-bottom:1px solid rgba(0,0,0,.08);
+  }
+  .title{margin:0;font-size:18px;font-weight:900;}
+  .close{
+    width:40px;height:40px;border-radius:10px;border:0;background:#f3f3f3;
+    cursor:pointer;font-size:18px;line-height:1;
+  }
+  .body{padding:16px;max-height:65vh;overflow:auto;}
+  ol{margin:0;padding-left:18px;}
+  li{margin:10px 0;}
+  .tip{margin-top:14px;padding:12px;border-radius:12px;background:rgba(255,204,0,.15);border:1px solid rgba(255,204,0,.35);font-weight:600;}
 </style>
 </head>
-
 <body>
 
-<button class="btn" id="openBtn">🛠️ Hoe herstel ik mijn schade?</button>
-
-<div class="modal" id="modal">
-  <div class="backdrop" id="backdrop"></div>
-
+<div class="modal" role="dialog" aria-modal="true" aria-label="Stappenplan schade herstellen">
   <div class="panel">
     <div class="header">
-      <h3>Stappenplan: schade herstellen</h3>
-      <button class="close" id="closeBtn">✕</button>
+      <h3 class="title">Stappenplan: schade herstellen</h3>
+      <button class="close" id="closeBtn" aria-label="Sluiten">✕</button>
     </div>
-
     <div class="body">
       <ol>
         <li><strong>Schuren:</strong> schuur de beschadiging vlak (P320–P600).</li>
         <li><strong>Ontvetten:</strong> reinig met ontvetter en schone doek.</li>
-        <li><strong>Primer:</strong> bij kaal metaal eerst primer, licht opschuren.</li>
+        <li><strong>Primer:</strong> bij kaal metaal/kunststof eerst primer, licht opschuren.</li>
         <li><strong>Kleurlaag:</strong> 2–4 dunne lagen aanbrengen.</li>
         <li><strong>Blanke lak:</strong> voor glans en bescherming.</li>
         <li><strong>Uitharden:</strong> volledig laten drogen.</li>
         <li><strong>Afwerken:</strong> eventueel licht polijsten.</li>
       </ol>
-
-      <div class="tip">
-        Tip: spuit eerst een test op karton en werk stofvrij.
-      </div>
+      <div class="tip">Tip: spuit eerst een test op karton en werk stofvrij.</div>
     </div>
   </div>
 </div>
 
 <script>
-const modal = document.getElementById("modal");
-const openBtn = document.getElementById("openBtn");
-const closeBtn = document.getElementById("closeBtn");
-const backdrop = document.getElementById("backdrop");
+  function close(){
+    // zeg tegen WordPress: sluit overlay
+    window.parent.postMessage({type:'TWIMVA_CLOSE'}, '*');
+    window.parent.postMessage('twimva-close', '*'); // fallback
+  }
+  document.getElementById('closeBtn').addEventListener('click', close);
 
-function openModal(){
-  modal.classList.add("open");
-  window.parent.postMessage("twimva-open","*");
-}
-
-function closeModal(){
-  modal.classList.remove("open");
-  window.parent.postMessage("twimva-close","*");
-}
-
-openBtn.addEventListener("click", openModal);
-closeBtn.addEventListener("click", closeModal);
-backdrop.addEventListener("click", closeModal);
-
-document.addEventListener("keydown", function(e){
-  if(e.key === "Escape") closeModal();
-});
+  // Optioneel: als parent een open-bericht stuurt, kunnen we hier iets mee doen
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'TWIMVA_OPEN_MODAL') {
+      // modal staat al open in deze simpele versie
+    }
+  });
 </script>
 
 </body>
