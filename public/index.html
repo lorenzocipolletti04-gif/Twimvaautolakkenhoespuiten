@@ -1,1 +1,193 @@
 
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Schade herstellen</title>
+  <style>
+    :root{
+      --bg: #ffffff;
+      --text: #111;
+      --muted: rgba(0,0,0,.65);
+      --border: rgba(0,0,0,.12);
+      --shadow: 0 20px 60px rgba(0,0,0,.25);
+      --radius: 14px;
+    }
+
+    html,body{
+      margin:0;
+      padding:0;
+      background: transparent;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    /* Container voor iframe, zodat het netjes past */
+    .wrap{
+      padding: 0;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-weight: 800;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0); }
+
+    /* Modal */
+    .modal{
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 999999;
+    }
+    .modal.open{ display:block; }
+
+    .backdrop{
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,.55);
+    }
+
+    .panel{
+      position: relative;
+      width: min(760px, calc(100% - 28px));
+      margin: 10vh auto;
+      background: var(--bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 16px 16px;
+      border-bottom: 1px solid rgba(0,0,0,.08);
+    }
+    .title{
+      margin:0;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .close{
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor:pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .body{
+      padding: 16px;
+      max-height: 65vh;
+      overflow: auto;
+    }
+
+    ol{
+      margin: 0;
+      padding-left: 18px;
+    }
+    li{ margin: 10px 0; }
+    .muted{ color: var(--muted); }
+
+    .tip{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,204,0,.35);
+      background: rgba(255,204,0,.14);
+      font-weight: 600;
+    }
+
+    /* Klein: panel lager */
+    @media (max-width: 520px){
+      .panel{ margin: 7vh auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <button class="btn" id="openBtn" type="button">🛠️ Hoe herstel ik mijn schade?</button>
+  </div>
+
+  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="backdrop" id="backdrop"></div>
+
+    <div class="panel" role="document" tabindex="-1">
+      <div class="header">
+        <h3 class="title">Stappenplan: schade herstellen</h3>
+        <button class="close" id="closeBtn" type="button" aria-label="Sluiten">✕</button>
+      </div>
+
+      <div class="body">
+        <ol>
+          <li><strong>Schuren:</strong> schuur de beschadiging vlak (bijv. P320–P600, afhankelijk van de schade).</li>
+          <li><strong>Ontvetten:</strong> reinig met ontvetter/siliconenverwijderaar en een schone microvezeldoek.</li>
+          <li><strong>Primer (indien nodig):</strong> bij kaal metaal/kunststof eerst primer, daarna licht opschuren.</li>
+          <li><strong>Kleurlaag:</strong> breng 2–4 dunne lagen aan met korte tussenpauzes.</li>
+          <li><strong>Blanke lak (bij 2-laags):</strong> voor glans & bescherming, meerdere dunne lagen.</li>
+          <li><strong>Uitharden:</strong> laat goed drogen/uitharden volgens het productadvies.</li>
+          <li><strong>Afwerking:</strong> eventueel polijsten na volledige uitharding voor een nette overgang.</li>
+        </ol>
+
+        <div class="tip">
+          Tip: spuit eerst een test op karton, werk stofvrij, en houd 20–25 cm afstand.
+          <div class="muted" style="margin-top:6px;font-weight:500;">
+            (Wil je dit stappenplan langer/korter of per “kleine/middel/grote schade”?)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const modal = document.getElementById('modal');
+      const openBtn = document.getElementById('openBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      const backdrop = document.getElementById('backdrop');
+      const panel = modal.querySelector('.panel');
+
+      let lastFocus = null;
+
+      function openModal(){
+        lastFocus = document.activeElement;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        panel.focus();
+      }
+
+      function closeModal(){
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+
+      openBtn.addEventListener('click', openModal);
+      closeBtn.addEventListener('click', closeModal);
+      backdrop.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('open')) return;
+        if (e.key === 'Escape') closeModal();
+      });
+    })();
+  </script>
+</body>
+</html>
